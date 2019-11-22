@@ -1,2 +1,2 @@
-# Bash-Scripts
-Collection of small bash scripts used for pentesting
+# Pentesting Scripts
+Collection of small scripts used for pentesting

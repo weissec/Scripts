@@ -1,10 +1,14 @@
 #!/usr/bin/bash
 
 usage() {
-	echo "Secretsmatch (bash):"
-	echo "Match hashcat cracked passwords with relative usernames in the secretsdump.py ntds file output"
+	echo "SecretsMatch"
 	echo
-	echo "Usage: secretsmatch.sh -n ntds -p potfile -o output"
+	echo "Match cracked passwords with relative usernames from the output file of the following command:"
+	echo "secretsdump.py -just-dc-ntlm --users-status Domain.local/username:password@192.168.10.12 > ntds.dit"
+	echo "Crack the hashes (example):"
+	echo "hashcat -m 1000 ./ntds.dit /wordlists/rockyou.txt -r /rules/OneRuleToRuleThemAll.rule -O"
+	echo
+	echo "Usage: secretsmatch.sh -n ntds.dit -p hashcat.potfile -o output.txt"
 	echo
 	echo " option:           description:"
 	echo " -n                path of secretsdump.py ntds file output"
@@ -12,7 +16,6 @@ usage() {
 	echo " -o                path of output file"
 	echo " -h                display this help message"
 	echo
-	echo "Example: secretsmatch.sh -n ./ntds -p ./hashcat.potfile -o ./output.txt"
 }
 
 while getopts "h:n:p:o:" option; do
@@ -31,7 +34,7 @@ if [[ $# = 0 ]]; then
 fi
 
 echo "[+] Extracting hashes from secretsdump.py ntds output.."
-grep ":::" $ntds > ntds-cleaned.tmp
+grep ":::" $ntds > .ntds-cleaned.tmp
 
 echo "[+] Matching cracked passwords.."
 echo
@@ -43,22 +46,27 @@ for line in $(cat $potfile); do
 
 	echo -ne "\r\e[KMatching: "$plain
 
-	for hashes in $(cat ntds-cleaned.tmp); do
+	for hashes in $(cat .ntds-cleaned.tmp); do
 
 		if [[ $hashes == *$ntlm* ]]; then
-  			echo $(echo $hashes | cut -d ":" -f1)":"$plain >> $output.tmp
+  			echo $(echo $hashes | cut -d ":" -f1)":"$plain >> .$output.tmp
 		fi
 
 	done
 
 done
-
 echo
 echo
 echo "[+] Cleaning output file.."
-sort -u $output.tmp > $output
+sort -u .$output.tmp > $output
 echo "[+] Removing temporary files.."
-rm $output.tmp
-rm ntds-cleaned.tmp
-echo "[+] Finished! ("$(wc -l < $output)" users owned!)"
-
+usernum=$(wc -l < .ntds-cleaned.tmp)
+owned=$(wc -l < $output)
+rm .$output.tmp
+rm .ntds-cleaned.tmp
+echo "[+] Finished!"
+echo
+echo "Total of users accounts:  "$usernum
+echo "Accounts compromised:     "$owned
+echo "To calculate the percentage do: ("$owned" / "$usernum") * 100"
+echo

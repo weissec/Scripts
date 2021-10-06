@@ -3,10 +3,12 @@
 usage() {
 	echo "SecretsMatch"
 	echo
-	echo "Match cracked passwords with relative usernames from the output file of the following command:"
+	echo "This script matches cracked passwords with relative usernames from a NTDS file."
+	echo "To retrieve the NTDS file you can use the following command on your domain:"
 	echo "secretsdump.py -just-dc-ntlm --users-status Domain.local/username:password@192.168.10.12 > ntds.dit"
-	echo "Crack the hashes (example):"
+	echo "To Crack the hashes you can use the following command (example):"
 	echo "hashcat -m 1000 ./ntds.dit /wordlists/rockyou.txt -r /rules/OneRuleToRuleThemAll.rule -O"
+	echo "To combine the plaintext passwords with the correct users then run this script as per the following:"
 	echo
 	echo "Usage: secretsmatch.sh -n ntds.dit -p hashcat.potfile -o output.txt"
 	echo

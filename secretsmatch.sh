@@ -44,13 +44,7 @@ tot=$(wc -l < $potfile)
 echo "[+] Matching cracked passwords.."
 echo
 
-for line in $(cat $potfile); do
-
-	ntlm=$(echo $line | cut -d ":" -f1)
-	plain=$(echo $line |cut -d ":" -f2)
-
-
-	percentBar ()  {
+percentBar ()  {
     		local prct totlen=$((8*$2)) lastchar barstring blankstring;
     		printf -v prct %.2f "$1"
     		((prct=10#${prct/.}*totlen/10000, prct%8)) &&
@@ -60,24 +54,35 @@ for line in $(cat $potfile); do
     		printf -v barstring '%b' "${barstring// /\\U2588}$lastchar"
     		printf -v blankstring '%*s' $(((totlen-prct)/8)) ''
     		printf -v "$3" '%s%s' "$barstring" "$blankstring"
-	}
+}
 
-	# 1f is the aproximation to decimal. e.g. 10.4 %
- 	prog=$(awk -v v1="$i" -v v2="$tot" 'BEGIN{printf "%.1f", v2/v1 * 100}')
+for line in $(cat $potfile); do
 
+	ntlm=$(echo $line | cut -d ":" -f1)
+	plain=$(echo $line |cut -d ":" -f2)
+
+ 	# 1f is the aproximation to decimal. e.g. 10.4 %
+	 prog=$(awk -v v1="$i" -v v2="$tot" 'BEGIN{printf "%.1f", v2/v1 * 100}')
+	
 	percentBar $prog 40 bar
 	printf '\rProgress: \e[47;32m%s\e[0m%6.2f%%' "$bar" $prog
- 
- 	# echo -ne "\r\e[KMatching: "$plain
+
+	# Check that all lines are in the correct format (hash size of 32 characters).
+	if [[ ${#ntlm} = 32 ]] ; then
+
+ 		grep $ntlm .ntds-cleaned.tmp | cut -d ":" -f1 | sed "s/$/:'$cleartext'/"
+
+		#for hashes in $(cat .ntds-cleaned.tmp); do
+
+			#if [[ $hashes == *$ntlm* ]]; then
+	  		#	echo $(echo $hashes | cut -d ":" -f1)":"$plain >> .$output.tmp
+			#fi
+		#done
+	else
+		echo $ntlm":"$plain >> Errors.txt
+ 	fi
   
-	for hashes in $(cat .ntds-cleaned.tmp); do
-
-		if [[ $hashes == *$ntlm* ]]; then
-  			echo $(echo $hashes | cut -d ":" -f1)":"$plain >> .$output.tmp
-		fi
-
-	done
-	((i++))
+  	((i++))
 done
 echo
 echo
@@ -93,5 +98,8 @@ echo "[+] Finished!"
 echo
 echo "Total of users accounts:  "$usernum
 echo "Accounts compromised:     "$owned " ("$percent"%)"
+
+# if errors exits, print message:
+
 echo
 exit

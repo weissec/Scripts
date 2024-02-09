@@ -63,8 +63,6 @@ for line in $(cat $potfile); do
 
  	# 1f is the aproximation to decimal. e.g. 10.4 %
 	prog=$(awk -v v1="$i" -v v2="$tot" 'BEGIN{printf "%.1f", v1/v2 * 100}')
-	echo $tot
- 	echo $prog
  
 	percentBar $prog 40 bar
 	printf '\rProgress: \e[47;32m%s\e[0m%6.2f%%' "$bar" $prog

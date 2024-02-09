@@ -1,3 +1,7 @@
+# Bash Progress Bar (created by F. Hauri - https://stackoverflow.com/users/1765658/f-hauri-give-up-github)
+# To use, just copy the function below in your code.
+# Call the function and attach the values to your variables.
+# $1 = percentage, $2 = size of bar on screen, $3 = used to display the bar correctly (don't change).
 
 percentBar ()  {
     local prct totlen=$((8*$2)) lastchar barstring blankstring;
@@ -11,7 +15,6 @@ percentBar ()  {
     printf -v "$3" '%s%s' "$barstring" "$blankstring"
 }
 
-
+# Calling the function (both lines needed to display the bar):
 percentBar 72.1 40 bar
-# printf 'Show this: \e[44;33;1m%s\e[0m at %s%%\n' "$bar" 72.1
-printf '\r\e[47;32m%s\e[0m%6.2f%%' "$bar" 65
+printf 'Progress: \r\e[47;32m%s\e[0m%6.2f%%' "$bar" 65

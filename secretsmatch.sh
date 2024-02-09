@@ -48,12 +48,27 @@ for line in $(cat $potfile); do
 
 	ntlm=$(echo $line | cut -d ":" -f1)
 	plain=$(echo $line |cut -d ":" -f2)
-	
- 	# echo -ne "\r\e[KProgress: [=                                       ] 0%"
-	# echo -ne "\r\e[KProgress: [========================================] 100%"
+
+
+	percentBar ()  {
+    		local prct totlen=$((8*$2)) lastchar barstring blankstring;
+    		printf -v prct %.2f "$1"
+    		((prct=10#${prct/.}*totlen/10000, prct%8)) &&
+        	printf -v lastchar '\\U258%X' $(( 16 - prct%8 )) ||
+            	lastchar=''
+    		printf -v barstring '%*s' $((prct/8)) ''
+    		printf -v barstring '%b' "${barstring// /\\U2588}$lastchar"
+    		printf -v blankstring '%*s' $(((totlen-prct)/8)) ''
+    		printf -v "$3" '%s%s' "$barstring" "$blankstring"
+	}
+
+	# 1f is the aproximation to decimal. e.g. 10.4 %
+ 	prog=$(awk -v v1="$i" -v v2="$tot" 'BEGIN{printf "%.1f", v2/v1 * 100}')
+
+	percentBar $prog 40 bar
+	printf '\rProgress: \e[47;32m%s\e[0m%6.2f%%' "$bar" $prog
+ 
  	# echo -ne "\r\e[KMatching: "$plain
-	prog=$(awk -v v1="$i" -v v2="$tot" 'BEGIN{printf "%.0f", v2/v1 * 100}')
- 	echo -ne "\r\e[KProgress: "$prog"%"
   
 	for hashes in $(cat .ntds-cleaned.tmp); do
 

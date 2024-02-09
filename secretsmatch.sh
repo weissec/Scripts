@@ -38,8 +38,8 @@ fi
 echo "[+] Extracting hashes from secretsdump.py ntds output.."
 grep ":::" $ntds > .ntds-cleaned.tmp
 
-i=0
-tot=$(wc -l < $potfile)
+i=1
+tot=$(($(wc -l < $potfile) + 0))
 
 echo "[+] Matching cracked passwords.."
 echo
@@ -62,15 +62,17 @@ for line in $(cat $potfile); do
 	plain=$(echo $line |cut -d ":" -f2)
 
  	# 1f is the aproximation to decimal. e.g. 10.4 %
-	 prog=$(awk -v v1="$i" -v v2="$tot" 'BEGIN{printf "%.1f", v2/v1 * 100}')
-	
+	prog=$(awk -v v1="$i" -v v2="$tot" 'BEGIN{printf "%.1f", v1/v2 * 100}')
+	echo $tot
+ 	echo $prog
+ 
 	percentBar $prog 40 bar
 	printf '\rProgress: \e[47;32m%s\e[0m%6.2f%%' "$bar" $prog
 
 	# Check that all lines are in the correct format (hash size of 32 characters).
 	if [[ ${#ntlm} = 32 ]] ; then
 
- 		grep $ntlm .ntds-cleaned.tmp | cut -d ":" -f1 | sed "s/$/:'$cleartext'/"
+ 		grep $ntlm .ntds-cleaned.tmp | cut -d ":" -f1 | sed "s/$/:$plain/"
 
 		#for hashes in $(cat .ntds-cleaned.tmp); do
 

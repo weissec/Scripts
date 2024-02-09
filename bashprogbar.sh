@@ -17,4 +17,4 @@ percentBar ()  {
 
 # Calling the function (both lines needed to display the bar):
 percentBar 72.1 40 bar
-printf 'Progress: \r\e[47;32m%s\e[0m%6.2f%%' "$bar" 65
+printf '\rProgress: \e[47;32m%s\e[0m%6.2f%%' "$bar" 65

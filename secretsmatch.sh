@@ -70,14 +70,8 @@ for line in $(cat $potfile); do
 	# Check that all lines are in the correct format (hash size of 32 characters).
 	if [[ ${#ntlm} = 32 ]] ; then
 
- 		grep $ntlm .ntds-cleaned.tmp | cut -d ":" -f1 | sed "s/$/:$plain/"
+ 		grep $ntlm .ntds-cleaned.tmp | cut -d ":" -f1 | sed "s/$/:$plain/"  >> .$output.tmp
 
-		#for hashes in $(cat .ntds-cleaned.tmp); do
-
-			#if [[ $hashes == *$ntlm* ]]; then
-	  		#	echo $(echo $hashes | cut -d ":" -f1)":"$plain >> .$output.tmp
-			#fi
-		#done
 	else
 		echo $ntlm":"$plain >> Errors.txt
  	fi

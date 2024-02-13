@@ -57,7 +57,7 @@ fi
 
 # Script start
 echo "[+] Extracting hashes from NTDS file.."
-grep ":::" $ntds > .ntds-cleaned.tmp
+grep -a ":::" $ntds > .ntds-cleaned.tmp
 
 i=1
 tot=$(($(wc -l < $potfile) + 0))
